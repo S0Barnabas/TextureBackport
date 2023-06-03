@@ -39,6 +39,13 @@ public class TextureAtlas
         return texture.Sources;
     }
 
+    public TextureSource AddComposite(int top, int left, string sourceDirectory, Func<string, TextureResolution, Version, Bitmap> getComposite)
+    {
+        var texture = new CompositeTexture(left, top, sourceDirectory, getComposite);
+        textures.Add(texture);
+        return texture.Sources;
+    }
+
     public void DrawAtlas(Version v, string sourceDirectory, string targetFile, string templateAtlas)
     {
         DrawAtlas(v, sourceDirectory, targetFile, (Bitmap)Image.FromFile(templateAtlas));
@@ -51,7 +58,7 @@ public class TextureAtlas
         g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
         g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
         g.DrawImage(templateAtlas, 0, 0, atlasSize.Width, atlasSize.Height);
-        
+
         foreach (var t in textures)
         {
             var tSource = t.Sources[v];
@@ -60,22 +67,23 @@ public class TextureAtlas
                 Console.WriteLine("Texture not supported by selected version!");
                 continue;
             }
-            tSource = Path.Combine(sourceDirectory, t.Sources[v]!);
+            tSource = Path.Combine(t is CompositeTexture ? ((CompositeTexture)t).SourceDirectory : sourceDirectory , t.Sources[v]!);
             if (!File.Exists(tSource))
             {
-                Console.WriteLine(tSource);
+                Console.WriteLine("File not found: {0}", tSource);
                 continue;
             }
 
             g.SetClip(new Rectangle(t.X * (int)resolution, t.Y * (int)resolution, (int)resolution, (int)resolution));
             g.Clear(Color.Transparent);
             g.ResetClip();
-            using var sourceBmp = new Bitmap(tSource);
-            using var resizeBmp = new Bitmap(sourceBmp, (int)resolution, (int)resolution);
-            g.DrawImage(resizeBmp, t.X * (int)resolution, t.Y * (int)resolution);
+            Console.WriteLine("Drawing: {0}", t.Sources[v]);
+            using var sourceBmp = t is CompositeTexture ? ((CompositeTexture)t).GetComposite(resolution, v) : new Bitmap(tSource);
+            g.DrawImage(sourceBmp, t.X * (int)resolution, t.Y * (int)resolution, (int)resolution, (int)resolution);
             Progress++;
         }
-        Directory.CreateDirectory(targetFile.Remove(targetFile.LastIndexOf('\\')));
+        if (targetFile.Contains('\\') && !Directory.Exists(targetFile.Remove(targetFile.LastIndexOf('\\'))))
+            Directory.CreateDirectory(targetFile.Remove(targetFile.LastIndexOf('\\')));
         result.Save(targetFile);
     }
 }

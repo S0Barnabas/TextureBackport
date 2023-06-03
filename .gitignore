@@ -3,3 +3,5 @@ TextureBackport.Api/obj
 TextureBackport.Test
 TextureBackport.Gui/obj
 TextureBackport.Gui/bin
+.git
+.vs

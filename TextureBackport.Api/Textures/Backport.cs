@@ -72,6 +72,72 @@ public static class Backport
         terrain.AddTexture(1, 6).FromTo("iron_block");
         terrain.AddTexture(1, 7).FromTo("gold_block");
         terrain.AddTexture(1, 8).FromTo("diamond_block");
+        terrain.AddComposite(1, 9, entityFolder, (src, res, ver) =>
+        {
+            var resMul = (int)res / 16;
+            var result = new Bitmap((int)res, (int)res);
+            using var sourceBmp = (Bitmap)Image.FromFile(src);
+            using var g = Graphics.FromImage(result);
+            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+
+            var chestTopX = ver > Version.V114X ? 28 : 14;
+
+            using var chestTop = sourceBmp.Clone(new Rectangle(chestTopX * resMul, 0, 14 * resMul, 14 * resMul), sourceBmp.PixelFormat);
+            g.DrawImage(chestTop, 0, 0, (int)res, (int)res);
+
+            return result;
+        }).FromTo(@"chest\normal");
+        terrain.AddComposite(1, 10, entityFolder, (src, res, ver) => 
+        {
+            var resMul = (int)res / 16;
+            var result = new Bitmap((int)res, (int)res);
+            using var sourceBmp = (Bitmap)Image.FromFile(src);
+            using var g = Graphics.FromImage(result);
+            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+
+            var chestSideBottomY = ver > Version.V114X ? 33 : 34;
+
+            var chestSideTop = sourceBmp.Clone(new Rectangle(0, 14 * resMul, 14 * resMul, 5 * resMul), sourceBmp.PixelFormat);
+            var chestSideBottom = sourceBmp.Clone(new Rectangle(0, chestSideBottomY * resMul, 14 * resMul, 9 * resMul), sourceBmp.PixelFormat);
+            if (ver > Version.V114X)
+            {
+                chestSideTop.RotateFlip(RotateFlipType.RotateNoneFlipY);
+                chestSideBottom.RotateFlip(RotateFlipType.RotateNoneFlipY);
+            }
+            g.DrawImage(chestSideTop, 0, 0, 16 * resMul, 6 * resMul);
+            g.DrawImage(chestSideBottom, 0, 6 * resMul, 16 * resMul, 10 * resMul);
+
+            return result;
+        }).FromTo(@"chest\normal");
+        terrain.AddComposite(1, 11, entityFolder, (src, res, ver) => 
+        {
+            var resMul = (int)res / 16;
+            var result = new Bitmap((int)res, (int)res);
+            using var sourceBmp = (Bitmap)Image.FromFile(src);
+            using var g = Graphics.FromImage(result);
+            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+
+            var chestFrontX = ver > Version.V114X ? 42 : 14;
+            var chestFrontBottomY = ver > Version.V114X ? 33 : 34;
+
+            using var chestFrontTop = sourceBmp.Clone(new Rectangle(chestFrontX * resMul, 14 * resMul, 14 * resMul, 5 * resMul), sourceBmp.PixelFormat);
+            using var chestFrontBottom = sourceBmp.Clone(new Rectangle(chestFrontX * resMul, chestFrontBottomY * resMul, 14 * resMul, 9 * resMul), sourceBmp.PixelFormat);
+            using var chestFrontLock = sourceBmp.Clone(new Rectangle(1 * resMul, 1 * resMul, 2 * resMul, 4 * resMul), sourceBmp.PixelFormat);
+            if (ver > Version.V114X)
+            {
+                chestFrontTop.RotateFlip(RotateFlipType.RotateNoneFlipY);
+                chestFrontBottom.RotateFlip(RotateFlipType.RotateNoneFlipY);
+                chestFrontLock.RotateFlip(RotateFlipType.RotateNoneFlipY);
+            }
+            g.DrawImage(chestFrontTop, 0, 0, 16 * resMul, 6 * resMul);
+            g.DrawImage(chestFrontBottom, 0, 6 * resMul, 16 * resMul, 10 * resMul);
+            g.DrawImage(chestFrontLock, 7 * resMul, 3 * resMul, 2 * resMul, 4 * resMul);
+
+            return result;
+        }).FromTo(@"chest\normal");
         terrain.AddTexture(1, 12).FromTo("mushroom_red", vTo: Version.V112X).FromTo("red_mushroom", Version.V113X);
         terrain.AddTexture(1, 13).FromTo("mushroom_brown", vTo: Version.V112X).FromTo("brown_mushroom", Version.V113X);
         terrain.AddTexture(2, 1).FromTo("gold_ore");
@@ -85,6 +151,58 @@ public static class Backport
             .FromTo("grass_block_side_overlay", Version.V113X);
         terrain.AddTexture(2, 7).FromTo("tallgrass", vTo: Version.V112X).FromTo("grass", Version.V113X);
         terrain.AddTexture(2, 8).FromTo("grass_top", vTo: Version.V112X).FromTo("grass_block_top", Version.V113X);
+        terrain.AddComposite(2, 9, entityFolder, (src, res, ver) => {
+            var resMul = (int)res / 16;
+            var result = new Bitmap((int)res, (int)res);
+            using var sourceBmp = (Bitmap)Image.FromFile(src);
+            using var g = Graphics.FromImage(result);
+            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+
+            var chestLeftFrontX = ver > Version.V114X ? 43 : 14;
+            var chestLeftFrontBottomY = ver > Version.V114X ? 33 : 34;
+            var chestLeftFrontLockX = ver > Version.V114X ? 3 : 1;
+            using var doubleChestLeftFrontTop = sourceBmp.Clone(new Rectangle(chestLeftFrontX * resMul, 14 * resMul, 15 * resMul, 5 * resMul), sourceBmp.PixelFormat);
+            using var doubleChestLeftFrontBottom = sourceBmp.Clone(new Rectangle(chestLeftFrontX * resMul, chestLeftFrontBottomY * resMul, 15 * resMul, 9 * resMul), sourceBmp.PixelFormat);
+            using var doubleChestLeftFrontLock = sourceBmp.Clone(new Rectangle(chestLeftFrontLockX * resMul, 1 * resMul, 1 * resMul, 4 * resMul), sourceBmp.PixelFormat);
+            if (ver > Version.V114X)
+            {
+                doubleChestLeftFrontTop.RotateFlip(RotateFlipType.RotateNoneFlipY);
+                doubleChestLeftFrontBottom.RotateFlip(RotateFlipType.RotateNoneFlipY);
+                doubleChestLeftFrontLock.RotateFlip(RotateFlipType.RotateNoneFlipY);
+            }
+            g.DrawImage(doubleChestLeftFrontTop, 0, 0, 16 * resMul, 6 * resMul);
+            g.DrawImage(doubleChestLeftFrontBottom, 0, 6 * resMul, 16 * resMul, 10 * resMul);
+            g.DrawImage(doubleChestLeftFrontLock, 15 * resMul, 3 * resMul, 1 * resMul, 4 * resMul);
+
+            return result;
+        }).FromTo(@"chest\normal_double", vTo: Version.V114X).FromTo(@"chest\normal_left", Version.V115X);
+        terrain.AddComposite(2, 10, entityFolder, (src, res, ver) => {
+            var resMul = (int)res / 16;
+            var result = new Bitmap((int)res, (int)res);
+            using var sourceBmp = (Bitmap)Image.FromFile(src);
+            using var g = Graphics.FromImage(result);
+            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+
+            var chestRightFrontX = ver > Version.V114X ? 43 : 29;
+            var chestRightFrontBottomY = ver > Version.V114X ? 33 : 34;
+            var chestRightFrontLockX = ver > Version.V114X ? 3 : 2;
+            using var doubleChestRightFrontTop = sourceBmp.Clone(new Rectangle(chestRightFrontX * resMul, 14 * resMul, 15 * resMul, 5 * resMul), sourceBmp.PixelFormat);
+            using var doubleChestRightFrontBottom = sourceBmp.Clone(new Rectangle(chestRightFrontX * resMul, chestRightFrontBottomY * resMul, 15 * resMul, 9 * resMul), sourceBmp.PixelFormat);
+            using var doubleChestRightFrontLock = sourceBmp.Clone(new Rectangle(chestRightFrontLockX * resMul, 1 * resMul, 1 * resMul, 4 * resMul), sourceBmp.PixelFormat);
+            if (ver > Version.V114X)
+            {
+                doubleChestRightFrontTop.RotateFlip(RotateFlipType.RotateNoneFlipY);
+                doubleChestRightFrontBottom.RotateFlip(RotateFlipType.RotateNoneFlipY);
+                doubleChestRightFrontLock.RotateFlip(RotateFlipType.RotateNoneFlipY);
+            }
+            g.DrawImage(doubleChestRightFrontTop, 0, 0, 16 * resMul, 6 * resMul);
+            g.DrawImage(doubleChestRightFrontBottom, 0, 6 * resMul, 16 * resMul, 10 * resMul);
+            g.DrawImage(doubleChestRightFrontLock, 0, 3 * resMul, 1 * resMul, 4 * resMul);
+
+            return result;
+        }).FromTo(@"chest\normal_double", vTo: Version.V114X).FromTo(@"chest\normal_right", Version.V115X);
         terrain.AddTexture(2, 11).FromTo("crafting_table_top");
         terrain.AddTexture(2, 12).FromTo("furnace_front_off", vTo: Version.V112X)
             .FromTo("furnace_front", Version.V113X);
@@ -99,6 +217,50 @@ public static class Backport
         terrain.AddTexture(3, 5).FromTo("leaves_oak", vTo: Version.V112X).FromTo("oak_leaves", Version.V113X);
         terrain.AddTexture(3, 7).FromTo("deadbush", vTo: Version.V112X).FromTo("dead_bush", Version.V113X);
         terrain.AddTexture(3, 8).FromTo("fern");
+        terrain.AddComposite(3, 9, entityFolder, (src, res, ver) => {
+            var resMul = (int)res / 16;
+            var result = new Bitmap((int)res, (int)res);
+            using var sourceBmp = (Bitmap)Image.FromFile(src);
+            using var g = Graphics.FromImage(result);
+            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+
+            var chestRightBackX = ver > Version.V114X ? 14 : 58;
+            var chestRightBackBottomY = ver > Version.V114X ? 33 : 34;
+            using var doubleChestRightBackTop = sourceBmp.Clone(new Rectangle(chestRightBackX * resMul, 14 * resMul, 15 * resMul, 5 * resMul), sourceBmp.PixelFormat);
+            using var doubleChestRightBackBottom = sourceBmp.Clone(new Rectangle(chestRightBackX * resMul, chestRightBackBottomY * resMul, 15 * resMul, 9 * resMul), sourceBmp.PixelFormat);
+            if (ver > Version.V114X)
+            {
+                doubleChestRightBackTop.RotateFlip(RotateFlipType.RotateNoneFlipY);
+                doubleChestRightBackBottom.RotateFlip(RotateFlipType.RotateNoneFlipY);
+            }
+            g.DrawImage(doubleChestRightBackTop, 0, 0, 16 * resMul, 6 * resMul);
+            g.DrawImage(doubleChestRightBackBottom, 0, 6 * resMul, 16 * resMul, 10 * resMul);
+
+            return result;
+        }).FromTo(@"chest\normal_double", vTo: Version.V114X).FromTo(@"chest\normal_right", Version.V115X);
+        terrain.AddComposite(3, 10, entityFolder, (src, res, ver) => {
+            var resMul = (int)res / 16;
+            var result = new Bitmap((int)res, (int)res);
+            using var sourceBmp = (Bitmap)Image.FromFile(src);
+            using var g = Graphics.FromImage(result);
+            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+
+            var chestLeftBackX = ver > Version.V114X ? 14 : 73;
+            var chestLeftBackBottomY = ver > Version.V114X ? 33 : 34;
+            using var doubleChestLeftBackTop = sourceBmp.Clone(new Rectangle(chestLeftBackX * resMul, 14 * resMul, 15 * resMul, 5 * resMul), sourceBmp.PixelFormat);
+            using var doubleChestLeftBackBottom = sourceBmp.Clone(new Rectangle(chestLeftBackX * resMul, chestLeftBackBottomY * resMul, 15 * resMul, 9 * resMul), sourceBmp.PixelFormat);
+            if (ver > Version.V114X)
+            {
+                doubleChestLeftBackTop.RotateFlip(RotateFlipType.RotateNoneFlipY);
+                doubleChestLeftBackBottom.RotateFlip(RotateFlipType.RotateNoneFlipY);
+            }
+            g.DrawImage(doubleChestLeftBackTop, 0, 0, 16 * resMul, 6 * resMul);
+            g.DrawImage(doubleChestLeftBackBottom, 0, 6 * resMul, 16 * resMul, 10 * resMul);
+
+            return result;
+        }).FromTo(@"chest\normal_double", vTo: Version.V114X).FromTo(@"chest\normal_left", Version.V115X);
         terrain.AddTexture(3, 11).FromTo("crafting_table_side");
         terrain.AddTexture(3, 12).FromTo("crafting_table_front");
         terrain.AddTexture(3, 13).FromTo("furnace_front_on");
@@ -390,6 +552,8 @@ public static class Backport
 
         #endregion
 
+        //terrain.DrawAtlas(version, blocksFolder, @"backport\terrain.png", terrainTemplateAtlas);
+        //items.DrawAtlas(version, itemsFolder, @"backport\gui\items.png", itemTemplateAtlas);
         if (string.IsNullOrEmpty(terrainTemplateAtlas))
             await Task.Run(() => terrain.DrawAtlas(version, blocksFolder, @"backport\terrain.png", TerrainTemplate));
         else
@@ -414,6 +578,8 @@ public static class Backport
 
         if (File.Exists(Path.Combine(textureFolder, @"gui\icons.png")))
             File.Copy(Path.Combine(textureFolder, @"gui\icons.png"), @"backport\gui\icons.png");
+        if (File.Exists(Path.Combine(blocksFolder, @"gui\icons.png")))
+            File.Copy(Path.Combine(blocksFolder, @"gui\icons.png"), @"backport\gui\icons.png");
 
         var fileNamePrefix = "backport_";
         var targetFile = Path.Combine(targetDirectory, fileNamePrefix + Path.GetFileName(sourceFile));

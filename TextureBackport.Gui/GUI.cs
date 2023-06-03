@@ -156,7 +156,6 @@ public partial class GUI : Form
         var targetDirectory = tboxOutput.Text;
         Backport.TerrainTemplate = Properties.Resources.terrain;
         Backport.ItemTemplate = Properties.Resources.items;
-
         await Task.Run(() => Backport.CreateTexturePack(
             version,
             resolution,
