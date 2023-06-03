@@ -17,3 +17,4 @@ List of textures that cannot be replaced:
 - Bed block (only if a resource pack version is higher than 1.11.x)
 - Jack'o Lantern block face (only if a resource pack version is higher than 1.11.x)
 - Bed item (only if a resource pack version is higher than 1.11.x)
+- Lava and water (planning on adding these)
