@@ -44,6 +44,10 @@ public partial class GUI : Form
             ["512x512"] = TextureResolution.X512,
         };
         Load += GUI_Load;
+        tboxItem.TextChanged += TextBox_TextChanged;
+        tboxTerrain.TextChanged += TextBox_TextChanged;
+        tboxSourceFile.TextChanged += TextBox_TextChanged;
+        tboxOutput.TextChanged += TextBox_TextChanged;
         btnSearchSourceFile.Click += BtnSearchSourceFile_Click;
         btnSearchOutput.Click += BtnSearchOutput_Click;
         btnSearchTerrain.Click += BtnSearchTerrain_Click;
@@ -52,6 +56,11 @@ public partial class GUI : Form
         btnPort.Click += BtnPort_Click;
         Backport.OnPortFinished += Backport_OnPortFinished;
         btnPort.Enabled = false;
+    }
+
+    private void TextBox_TextChanged(object? sender, EventArgs e)
+    {
+        btnPort.Enabled = validation();
     }
 
     private bool validation()
