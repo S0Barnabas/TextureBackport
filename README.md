@@ -68,7 +68,7 @@ You can simply change the ```sourceFilename``` attribute of the ```<TextureSourc
 </ResourceMap>
 ```
 
-To ensure that this works starting from version 1.16 or newer, do not comment out or modify the default tags, instead create new tags and set the ```vFrom``` and ```vTo``` attributes as follows:
+To ensure that this works starting from version 1.16, do not comment out or modify the default tags, instead create new tags and set the ```vFrom``` and ```vTo``` attributes as follows:
 ```xml
 <ResourceMap>
   ...
