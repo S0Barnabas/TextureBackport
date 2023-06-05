@@ -1,4 +1,4 @@
-﻿namespace TextureBackport.Api.Textures;
+﻿namespace TextureBackport.Api.ResourceMapping;
 
 public enum TextureResolution
 {
