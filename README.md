@@ -12,9 +12,9 @@ If a lower resolution atlas is used, it will be upscaled, to the selected resoul
 Some textures cannot be replaced on the texture atlas (see th detailed list below).  
 In such cases the texture on the selected template atlas will be used instead.
 
-List of textures that cannot be replaced:
-- Chest block (single and double)
+These textures will not be replaced:
 - Bed block (only if a resource pack version is higher than 1.11.x)
 - Jack'o Lantern block face (only if a resource pack version is higher than 1.11.x)
 - Bed item (only if a resource pack version is higher than 1.11.x)
 - Lava and water (planning on adding these)
+- Paintings (planning on adding these)
