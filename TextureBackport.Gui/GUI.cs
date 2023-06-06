@@ -123,20 +123,7 @@ public partial class GUI : Form
             sourceFile,
             targetDirectory,
             version,
-            resolution,
-            new[]
-            {
-                (0, Properties.Resources.terrain),
-                (1, Properties.Resources.items)
-            },
-            new[]
-            {
-                (0, @"backport\terrain.png"),
-                (1, @"backport\gui\items.png"),
-                (2, @"backport\mob"),
-                (3, @"backport\armor"),
-                (4, @"backport")
-            }
+            resolution
             )).ContinueWith(x =>
             {
                 Invoke(new MethodInvoker(() =>

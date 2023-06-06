@@ -18,15 +18,15 @@ public class XmlBackport
     private readonly ResourceMap map;
     private TextureResolution resolution;
     private int versionId;
-    private (int index, Bitmap template)[] templates;
-    private (int index, string targetDirectory)[] targets;
+
+    private TemplateManager templateManager;
 
     public delegate void ProgressLogged(LogLevel level, string entry);
     public event ProgressLogged OnProgressLogged;
 
-    public XmlBackport(
-        string resourceMapXml)
+    public XmlBackport(string resourceMapXml)
     {
+        templateManager = new TemplateManager();
         map = ResourceMap.FromXml(resourceMapXml) ?? throw new ArgumentException($"Resource map not found at: {resourceMapXml}");
     }
 
@@ -35,37 +35,23 @@ public class XmlBackport
         return map.SupportedVersions.SupportList;
     }
 
-    public void CreateTexturePack(
-        string sourceFile, 
-        string targetDirectory, 
-        int versionId,
-        TextureResolution resolution,
-        (int index, Bitmap template)[] templates,
-        (int index, string targetDirectory)[] targets)
+    public void CreateTexturePack(string sourceFile, string targetDirectory, int versionId, TextureResolution resolution)
     {
         this.versionId = versionId;
         this.resolution = resolution;
-        this.templates = templates;
-        this.targets = targets;
-        if (Directory.Exists("texture_source"))
-            Directory.Delete("texture_source", true);
-        if (Directory.Exists("backport"))
-            Directory.Delete("backport", true);
+
+        if (Directory.Exists("texture_source")) Directory.Delete("texture_source", true);
+        if (Directory.Exists("templates")) Directory.Delete("templates", true);
+        if (Directory.Exists("backport")) Directory.Delete("backport", true);
 
         ZipFile.ExtractToDirectory(sourceFile, "texture_source");
+        templateManager.ExtractTemplate("b173", "templates");
         Directory.CreateDirectory("backport");
 
         for (int i = 0; i < map.TextureAtlases.Count; i++)
-        {
-            var template = templates.FirstOrDefault(x => x.index == i);
-            var target = targets.FirstOrDefault(x => x.index == i);
-            drawAtlas(map.TextureAtlases[i], target.targetDirectory, template.template);
-        }
+            drawAtlas(map.TextureAtlases[i]);
         for (int i = 0; i < map.TextureBundles.Count; i++)
-        {
-            var target = targets.FirstOrDefault(x => x.index == i + map.TextureAtlases.Count);
-            drawBundle(map.TextureBundles[i], target.targetDirectory);
-        }
+            drawBundle(map.TextureBundles[i]);
 
         var fileNamePrefix = "backport_";
         var targetFile = Path.Combine(targetDirectory, fileNamePrefix + Path.GetFileName(sourceFile));
@@ -78,18 +64,24 @@ public class XmlBackport
         ZipFile.CreateFromDirectory("backport", targetFile);
 
         Directory.Delete("texture_source", true);
+        Directory.Delete("templates", true);
         Directory.Delete("backport", true);
     }
 
-    private void drawAtlas(TextureAtlas atlas, string targetFile, Bitmap template)
+    private void drawAtlas(TextureAtlas atlas)
     {
         var atlasSourceDirectories = atlas.SourceDirectory.Split(',');
+        var templateFile = $"templates\\{atlas.TemplateFile}.png";
+        var targetFile = $"backport\\{atlas.TargetFile}.png";
+
+        using var templateBmp = (Bitmap)Image.FromFile(templateFile);
 
         var result = new Bitmap((int)resolution * 16, (int)resolution * 16);
         using var g = Graphics.FromImage(result);
         g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
         g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
-        g.DrawImage(template, 0, 0, (int)resolution * 16, (int)resolution * 16);
+
+        g.DrawImage(templateBmp, 0, 0, (int)resolution * 16, (int)resolution * 16);
 
         drawAtlasTextures(atlas.AtlasTextures, atlasSourceDirectories, g);
         drawCompositeTextures(atlas.CompositeTextures, atlasSourceDirectories, g);
@@ -105,7 +97,7 @@ public class XmlBackport
             var tSrc = texture.TextureSources.Find(src => versionId >= src.From && (versionId <= src.To || src.To == 0));
             if (tSrc == null)
             {
-                OnProgressLogged.Invoke(LogLevel.WARN, "Texture not supported by selected version!");
+                OnProgressLogged?.Invoke(LogLevel.WARN, "Texture not supported by selected version!");
                 continue;
             }
 
@@ -115,14 +107,14 @@ public class XmlBackport
                 var path = Path.Combine("texture_source", sourceDirectory, tSrc.SourceFileName + ".png");
                 if (File.Exists(path))
                 {
-                    OnProgressLogged.Invoke(LogLevel.INFO, $"Drawing atlas texture: {path}");
-                    drawAtlasTexture(g, texture.X, texture.Y, path);
+                    OnProgressLogged?.Invoke(LogLevel.INFO, $"Drawing atlas texture: {path}");
+                    drawAtlasTexture(g, texture.X, texture.Y, texture.Width, texture.Height, path);
                     sourceFileFound = true;
                     break;
                 }
             }
             if (!sourceFileFound)
-                OnProgressLogged.Invoke(LogLevel.ERROR, $"File ({tSrc.SourceFileName}) not found in any of the provided source directories!");
+                OnProgressLogged?.Invoke(LogLevel.ERROR, $"File ({tSrc.SourceFileName}) not found in any of the provided source directories!");
         }
     }
 
@@ -164,14 +156,14 @@ public class XmlBackport
         }
     }
 
-    private void drawAtlasTexture(Graphics g, int x, int y, string filePath)
+    private void drawAtlasTexture(Graphics g, int x, int y, int width, int height, string filePath)
     {
         g.SetClip(new Rectangle(x * (int)resolution, y * (int)resolution, (int)resolution, (int)resolution));
         g.Clear(Color.Transparent);
         g.ResetClip();
 
         using var sourceBmp = new Bitmap(filePath);
-        g.DrawImage(sourceBmp, x * (int)resolution, y * (int)resolution, (int)resolution, (int)resolution);
+        g.DrawImage(sourceBmp, x * (int)resolution, y * (int)resolution, width * (int)resolution, height * (int)resolution);
     }
 
     private void drawCompositeTexture(Graphics g, int x, int y, CompositeTextureSource cts, string sourceDirectory)
@@ -189,7 +181,7 @@ public class XmlBackport
         foreach (var crop in cts.TextureCrops)
         {
             var sourceFile = Path.Combine(sourceDirectory, crop.SourceFileName + ".png");
-            OnProgressLogged.Invoke(LogLevel.INFO, $"Drawing composite fragment: {sourceFile}");
+            OnProgressLogged?.Invoke(LogLevel.INFO, $"Drawing composite fragment: {sourceFile}");
             using var sourceBmp = (Bitmap)Image.FromFile(sourceFile);
             using var fragmentBmp = sourceBmp.Clone(
                 new Rectangle(
@@ -208,25 +200,29 @@ public class XmlBackport
         g.DrawImage(result, x * (int)resolution, y * (int)resolution, (int)resolution, (int)resolution);
     }
 
-    private void drawBundle(TextureBundle bundle, string targetDirectory)
+    private void drawBundle(TextureBundle bundle)
     {
-        Directory.CreateDirectory(targetDirectory);
+        var targetDirectory = $"backport\\{bundle.TargetDirectory}";
+
+        if (!string.IsNullOrEmpty(targetDirectory))
+            Directory.CreateDirectory(targetDirectory);
+
         foreach (var texture in bundle.TextureFiles)
         {
             var tSrc = texture.TextureSources.Find(src => versionId >= src.From && (versionId <= src.To || src.To == 0));
             if (tSrc is null)
             {
-                OnProgressLogged.Invoke(LogLevel.WARN, "Texture not supported by selected version!");
+                OnProgressLogged?.Invoke(LogLevel.WARN, "Texture not supported by selected version!");
                 continue;
             }
             var sourceFile = Path.Combine("texture_source", bundle.SourceDirectory, tSrc.SourceFileName + ".png");
             if (!File.Exists(sourceFile))
             {
-                OnProgressLogged.Invoke(LogLevel.WARN, $"File not found: {sourceFile}");
+                OnProgressLogged?.Invoke(LogLevel.WARN, $"File not found: {sourceFile}");
                 continue;
             }
             var targetFile = Path.Combine(targetDirectory, texture.TargetFile + ".png");
-            OnProgressLogged.Invoke(LogLevel.INFO, $"Drawing: {targetFile}");
+            OnProgressLogged?.Invoke(LogLevel.INFO, $"Drawing: {targetFile}");
 
             using var sourceBmp = (Bitmap)Image.FromFile(sourceFile);
             int resMul = (int)resolution / 16;

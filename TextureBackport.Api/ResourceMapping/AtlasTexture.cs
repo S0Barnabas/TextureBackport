@@ -10,7 +10,13 @@ public class AtlasTexture
     
     [XmlAttribute("y")]
     public int Y { get; set; }
-    
+
+    [XmlAttribute("width")]
+    public int Width { get; set; }
+
+    [XmlAttribute("height")]
+    public int Height { get; set; }
+
     [XmlElement("TextureSource")]
     public List<TextureSource> TextureSources { get; set; }
 
@@ -19,10 +25,12 @@ public class AtlasTexture
         TextureSources = new List<TextureSource>();
     }
 
-    public AtlasTexture(int x, int y)
+    public AtlasTexture(int x, int y, int width, int height)
     {
         X = x;
         Y = y;
+        Width = width;
+        Height = height;
         TextureSources = new List<TextureSource>();
     }
     

@@ -51,16 +51,16 @@ public class ResourceMap
         SupportedVersions.SupportList = gameVersions;
     }
 
-    public TextureAtlas AddTextureAtlas(string sourceDirectory)
+    public TextureAtlas AddTextureAtlas(string sourceDirectory, string templateFile, string targetFile)
     {
-        var atlas = new TextureAtlas(sourceDirectory);
+        var atlas = new TextureAtlas(sourceDirectory, templateFile, targetFile);
         TextureAtlases.Add(atlas);
         return atlas;
     }
 
-    public TextureBundle AddTextureBundle(string sourceDirectory)
+    public TextureBundle AddTextureBundle(string sourceDirectory, string targetDirectory)
     {
-        var bundle = new TextureBundle(sourceDirectory);
+        var bundle = new TextureBundle(sourceDirectory, targetDirectory);
         TextureBundles.Add(bundle);
         return bundle;
     }
