@@ -20,11 +20,11 @@ The root structure of the resource map is as follows:
 ```xml
 <ResourceMap>
   <TextureAtlas sourceDirectory="block\texture\source1,block\texture\source2">
-    <AtlasTexture x="0" y="0">
+    <AtlasTexture x="0" y="0" width="1" height="1">
     </AtlasTexture>
   </TextureAtlas>
   <TextureAtlas sourceDirectory="item\texture\source1,item\texture\source2">
-    <AtlasTexture x="0" y="0">
+    <AtlasTexture x="0" y="0" width="1" height="1">
     </AtlasTexture>
   </TextureAtlas>
   <TextureBundle sourceDirectory="entity\texture\source">
@@ -53,8 +53,8 @@ You can simply change the ```sourceFilename``` attribute of the ```<TextureSourc
   ...
   <TextureAtlas>
     ...
-    <AtlasTexture x="1" y="0">
-      <!--<TextureSource sourceFileName="stone" vFrom="0" vTo="0" />-->
+    <AtlasTexture x="1" y="0" width="1" height="1">
+      <!--<TextureSource sourceFileName="stone" vFrom="0" vTo="0"/>-->
       <TextureSource sourceFileName="deepslate" vFrom="0" vTo="0" />
     </AtlasTexture>
     ...
@@ -74,14 +74,14 @@ To ensure that this works starting from version 1.16, do not comment out or modi
   ...
   <TextureAtlas>
     ...
-    <AtlasTexture x="1" y="0">
-      <TextureSource sourceFileName="stone" vFrom="0" vTo="115" />
+    <AtlasTexture x="1" y="0" width="1" height="1">
+      <TextureSource sourceFileName="stone" vFrom="0" vTo="115" width="1" height="1"/>
       <TextureSource sourceFileName="deepslate" vFrom="116" vTo="0" />
     </AtlasTexture>
     ...
-    <AtlasTexture x="0" y="1">
-      <TextureSource sourceFileName="cobblestone" vFrom="0" vTo="115" />
-      <TextureSource sourceFileName="cobbled_deepslate" vFrom="116" vTo="0" />
+    <AtlasTexture x="0" y="1" width="1" height="1">
+      <TextureSource sourceFileName="cobblestone" vFrom="0" vTo="115"/>
+      <TextureSource sourceFileName="cobbled_deepslate" vFrom="116" vTo="0"/>
     </AtlasTexture>
     ...
   </TextureAtlas>
