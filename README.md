@@ -18,28 +18,22 @@ Resource map files must be placed into a folder named **resource_maps**, next to
 
 The root structure of the resource map is as follows:
 ```xml
-<ResourceMap>
-  <TextureAtlas sourceDirectory="block\texture\source1,block\texture\source2">
-    <AtlasTexture x="0" y="0" width="1" height="1">
-    </AtlasTexture>
-  </TextureAtlas>
-  <TextureAtlas sourceDirectory="item\texture\source1,item\texture\source2">
-    <AtlasTexture x="0" y="0" width="1" height="1">
-    </AtlasTexture>
-  </TextureAtlas>
-  <TextureBundle sourceDirectory="entity\texture\source">
-    <TextureFile targetFile="file", targetWidth="0", targetHeight="0">
-    </TextureFile>
-  </TextureBundle>
-  <TextureBundle sourceDirectory="armor\texture\source">
-    <TextureFile targetFile="file", targetWidth="0", targetHeight="0">
-    </TextureFile>
-  </TextureBundle>
-  <TextureBundle sourceDirectory="gui\texture\source">
-    <TextureFile targetFile="file", targetWidth="0", targetHeight="0">
-    </TextureFile>
-  </TextureBundle>
-</ResourceMap>
+<ResourceStream>
+  <StreamCollection DestinationDirectory="dir/path">
+    <StreamCollectionItem TemplateBitmapPath="dir/image.png">
+      <BitmapStream DestinationFile="file.png">
+        <SourceDirectory>src/dir/path1</SourceDirectory>
+        <SourceDirectory>src/dir/path2</SourceDirectory>
+        <BitmapFrame SrcPath="dir/image.png" MinVersionId="0" MaxVersionId="0">
+          <TileCoords X="-1" Y="-1" />
+          <SrcRect X="0" Y="0" Width="0" Height="0" />
+          <DstRect X="0" Y="0" Width="0" Height="0" />
+          <RotateFlipType>RotateNoneFlipNone</RotateFlipType>
+        </BitmapFrame>
+      </BitmapStream>
+    </StreamCollectionItem>
+  </StreamCollection>
+</ResourceStream>
 ```
 
 Changing this root structure is possible but not recommended.
@@ -47,44 +41,67 @@ Changing this root structure is possible but not recommended.
 # Resource map customization examples
 
 Let's suppose that you want to port a 1.16 or newer resource pack and you want stone and cobblestone to look like deepslate and cobbled deepslate.
-You can simply change the ```sourceFilename``` attribute of the ```<TextureSource>``` tag to correspond with the deepslate and cobbled deepslate texture file name (.png without extension).
+You can simply change the ```SrcPath``` attribute of the ```<BitmapFrame>``` tag to correspond with the deepslate and cobbled deepslate texture file name.
 ```xml
-<ResourceMap>
+<ResourceStream>
   ...
-  <TextureAtlas>
-    ...
-    <AtlasTexture x="1" y="0" width="1" height="1">
-      <!--<TextureSource sourceFileName="stone" vFrom="0" vTo="0"/>-->
-      <TextureSource sourceFileName="deepslate" vFrom="0" vTo="0" />
-    </AtlasTexture>
-    ...
-    <AtlasTexture x="0" y="1">
-      <!--<TextureSource sourceFileName="cobblestone" vFrom="0" vTo="0" />-->
-      <TextureSource sourceFileName="cobbled_deepslate" vFrom="0" vTo="0" />
-    </AtlasTexture>
-    ...
-  </TextureAtlas>
+  <StreamCollection DestinationDirectory="">
+    <StreamCollectionItem TemplateBitmapPath="terrain.png">
+      <BitmapStream DestinationFile="terrain.png">
+        <SourceDirectory>assets/minecraft/textures/block</SourceDirectory>
+        <SourceDirectory>assets/minecraft/textures/blocks</SourceDirectory>
+        <SourceDirectory>assets/minecraft/textures/entity</SourceDirectory>
+        ...
+        <!--<BitmapFrame SrcPath="stone.png" MinVersionId="0" MaxVersionId="0">-->
+        <BitmapFrame SrcPath="deepslate.png" MinVersionId="0" MaxVersionId="0">
+          ...
+        </BitmapFrame>
+        <!--<BitmapFrame SrcPath="cobblestone.png" MinVersionId="0" MaxVersionId="0">-->
+        <BitmapFrame SrcPath="cobbled_deepslate.png" MinVersionId="0" MaxVersionId="0">
+          ...
+        </BitmapFrame>
+        ...
+      </BitmapStream>
+    </StreamCollectionItem>
+  </StreamCollection>
   ...
-</ResourceMap>
+</ResourceStream>
 ```
 
-To ensure that this works starting from version 1.16, do not comment out or modify the default tags, instead create new tags and set the ```vFrom``` and ```vTo``` attributes as follows:
+To ensure that this works starting from version 1.16, do not comment out or modify the default tags, instead create new tags and set the ```MinVersion``` and ```MaxVersion``` attributes as follows:
 ```xml
-<ResourceMap>
+<ResourceStream>
   ...
-  <TextureAtlas>
-    ...
-    <AtlasTexture x="1" y="0" width="1" height="1">
-      <TextureSource sourceFileName="stone" vFrom="0" vTo="115" width="1" height="1"/>
-      <TextureSource sourceFileName="deepslate" vFrom="116" vTo="0" />
-    </AtlasTexture>
-    ...
-    <AtlasTexture x="0" y="1" width="1" height="1">
-      <TextureSource sourceFileName="cobblestone" vFrom="0" vTo="115"/>
-      <TextureSource sourceFileName="cobbled_deepslate" vFrom="116" vTo="0"/>
-    </AtlasTexture>
-    ...
-  </TextureAtlas>
+  <StreamCollection DestinationDirectory="">
+    <StreamCollectionItem TemplateBitmapPath="terrain.png">
+      <BitmapStream DestinationFile="terrain.png">
+        <SourceDirectory>assets/minecraft/textures/block</SourceDirectory>
+        <SourceDirectory>assets/minecraft/textures/blocks</SourceDirectory>
+        <SourceDirectory>assets/minecraft/textures/entity</SourceDirectory>
+        ...
+        <!-- Default stone texture if pack version is 1.15 or lower -->
+        <BitmapFrame SrcPath="stone.png" MinVersionId="0" MaxVersionId="115">
+          ...
+        </BitmapFrame>
+        
+        <!-- Deepslate texture if pack version is 1.16 or higher -->
+        <BitmapFrame SrcPath="deepslate.png" MinVersionId="116" MaxVersionId="0">
+          ...
+        </BitmapFrame>
+        
+        <!-- Default cobblestone texture if pack version is 1.15 or lower -->
+        <BitmapFrame SrcPath="cobblestone.png" MinVersionId="0" MaxVersionId="115">
+          ...
+        </BitmapFrame>
+        
+        <!-- Cobbled deepslate texture if pack version is 1.16 or higher -->
+        <BitmapFrame SrcPath="cobbled_deepslate.png" MinVersionId="116" MaxVersionId="0">
+          ...
+        </BitmapFrame>
+        ...
+      </BitmapStream>
+    </StreamCollectionItem>
+  </StreamCollection>
   ...
-</ResourceMap>
+</ResourceStream>
 ```
