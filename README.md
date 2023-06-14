@@ -9,7 +9,7 @@ Feature list:
 These textures will not be replaced:
 - Bed item (only if a resource pack version is higher than 1.11.x)
 - Lava and water (planning on adding these)
-- Paintings (planning on adding these)
+- Fonts can be replaced but will not work by default due to unpredictable results at higher resolutions. This functionality can be restored by removing the comment tags from the corresponding section of the default resource map file
 
 # Resource mapping
 The resource map is a .xml file, that contains instructions as to how the resource pack should be converted to a Beta 1.7.3 compatible texture pack. 
