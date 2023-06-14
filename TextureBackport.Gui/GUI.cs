@@ -1,14 +1,17 @@
 using TextureBackport.Api;
-using TextureBackport.Api.ResourceMapping;
+using TextureBackport.Api.ImageFraming;
+using TextureBackport.Api.Logging;
 
 namespace TextureBackport.Gui;
 
 public partial class GUI : Form
 {
-    public Dictionary<string, TextureResolution> resolutions;
+    public List<string> resolutions;
     public Dictionary<string, LogLevel> logLevels;
 
-    public XmlBackport Backport;
+    public BackportManager Backport;
+
+    public ILogger Logger;
 
     public GUI()
     {
@@ -18,15 +21,11 @@ public partial class GUI : Form
         MaximizeBox = false;
         CenterToScreen();
 
-        resolutions = new Dictionary<string, TextureResolution>()
-        {
-            ["16x16"] = TextureResolution.X16,
-            ["32x32"] = TextureResolution.X32,
-            ["64x64"] = TextureResolution.X64,
-            ["128x128"] = TextureResolution.X128,
-            ["256x256"] = TextureResolution.X256,
-            ["512x512"] = TextureResolution.X512,
-        };
+        Logger = new Logger();
+
+        resolutions = new List<string>();
+        for (int i = 1; i <= 32; i *= 2)
+            resolutions.Add(TextureResolution.GetResolutionName(i));
 
         logLevels = new Dictionary<string, LogLevel>()
         {
@@ -35,6 +34,7 @@ public partial class GUI : Form
             ["Error"] = LogLevel.ERROR
         };
         Load += GUI_Load;
+        Logger.OnLogged += Backport_OnProgressLogged;
         tboxSourceFile.TextChanged += TextBox_TextChanged;
         tboxOutput.TextChanged += TextBox_TextChanged;
         btnSearchSourceFile.Click += BtnSearchSourceFile_Click;
@@ -44,13 +44,13 @@ public partial class GUI : Form
         btnPort.Enabled = false;
     }
 
+
     private void CbResourceMap_SelectedIndexChanged(object? sender, EventArgs e)
     {
         cbVersion.Items.Clear();
-        Backport = new XmlBackport(cbResourceMap.SelectedItem.ToString()!);
-
-        foreach (var version in Backport.GetSupportedVersions())
-            cbVersion.Items.Add(version.Name);
+        Backport = new BackportManager(cbResourceMap.SelectedItem.ToString()!, Logger);
+        foreach (var name in Backport.GetVersionNames())
+            cbVersion.Items.Add(name);
         cbVersion.SelectedIndex = 0;
     }
 
@@ -68,12 +68,12 @@ public partial class GUI : Form
     {
         if (Backport != null)
         {
-            foreach (var version in Backport.GetSupportedVersions())
-                cbVersion.Items.Add(version.Name);
+            foreach (var name in Backport.GetVersionNames())
+                cbVersion.Items.Add(name);
             cbVersion.SelectedIndex = 0;
         }
 
-        foreach (var name in resolutions.Keys)
+        foreach (var name in resolutions)
             cbResolution.Items.Add(name);
         cbResolution.SelectedIndex = 0;
 
@@ -114,20 +114,17 @@ public partial class GUI : Form
     {
         btnPort.Enabled = false;
         tboxProgress.Clear();
-        Backport.OnProgressLogged += Backport_OnProgressLogged;
-        var version = Backport.GetSupportedVersions().First(x => x.Name == cbVersion.SelectedItem.ToString()!).Id;
-        var resolution = resolutions[cbResolution.SelectedItem.ToString()!];
+        var version = GameVersion.GetVersionId(cbVersion.SelectedItem.ToString()!);
+        var upscaleMultiplier = TextureResolution.GetUpscaleMultiplier(cbResolution.SelectedItem.ToString()!);
         var sourceFile = tboxSourceFile.Text;
-        var targetDirectory = tboxOutput.Text;
-        await Task.Run(() => Backport.CreateTexturePack(
-            sourceFile,
-            targetDirectory,
-            version,
-            resolution
-            )).ContinueWith(x =>
+        var outputDirectory = tboxOutput.Text;
+        await Task.Run(
+            () => Backport.Start(sourceFile, outputDirectory, version, upscaleMultiplier))
+            .ContinueWith(x =>
             {
                 Invoke(new MethodInvoker(() =>
                 {
+                    Backport = new BackportManager(cbResourceMap.SelectedItem.ToString()!, Logger);
                     btnPort.Enabled = true;
                     MessageBox.Show(
                         "Texture pack generated successfully!",
@@ -142,7 +139,7 @@ public partial class GUI : Form
     {
         Invoke(new MethodInvoker(() =>
         {
-            if (logLevels[cbLogLevel.SelectedItem.ToString()!] == level)
+            if (logLevels[cbLogLevel.SelectedItem.ToString()!] <= level)
                 tboxProgress.AppendText($"[{level}]: {entry}{Environment.NewLine}");
         }));
     }

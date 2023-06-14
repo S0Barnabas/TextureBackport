@@ -7,11 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <None Remove="TexturePackTemplates\b173.zip" />
+      <None Remove="TextureSources\b1.7.3.zip" />
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="TexturePackTemplates\b173.zip" />
+      <EmbeddedResource Include="TextureSources\b1.7.3.zip" />
     </ItemGroup>
 
     <ItemGroup>
