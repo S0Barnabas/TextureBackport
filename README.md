@@ -68,7 +68,7 @@ You can simply change the ```SrcPath``` attribute of the ```<BitmapFrame>``` tag
 </ResourceStream>
 ```
 
-To ensure that this works starting from version 1.16, do not comment out or modify the default tags, instead create new tags and set the ```MinVersion``` and ```MaxVersion``` attributes as follows:
+To ensure that this works starting from version 1.16, do not comment out or modify the default tags, instead create new tags and set the ```MinVersionId``` and ```MaxVersionId``` attributes as follows:
 ```xml
 <ResourceStream>
   ...
