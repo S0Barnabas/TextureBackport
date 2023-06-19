@@ -2,7 +2,7 @@
 TextureBackport can generate Beta 1.7.3 compatible versions of resource packs.  
 
 Feature list:
-- supported resource pack versions: 1.8.x - 1.19.x
+- supported resource pack versions: 1.8.x - 1.20.x
 - custom resource pack resolution: 16x16 - 512x512
 - XML based resource mapping allows you to fully customize the generated texture pack
 
