@@ -61,7 +61,6 @@ public class ImageProcessingPipeline
         }
         catch (Exception)
         {
-
             _logger.Log(LogLevel.ERROR, $"Unexpected resolution! File: {frame.SrcPath}");
             return;
         }
