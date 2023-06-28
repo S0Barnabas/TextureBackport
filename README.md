@@ -2,7 +2,7 @@
 TextureBackport can generate Beta 1.7.3 compatible versions of resource packs.  
 
 Feature list:
-- supported resource pack versions: 1.8.x - 1.20.x
+- supported resource pack versions: 1.0 - 1.20.x
 - custom resource pack resolution: 16x16 - 512x512
 - XML based resource mapping allows you to fully customize the generated texture pack
 
@@ -13,7 +13,7 @@ These textures will not be replaced:
 
 # Resource mapping
 The resource map is a .xml file, that contains instructions as to how the resource pack should be converted to a Beta 1.7.3 compatible texture pack. 
-The default resource map can be downloaded from the [releases](https://github.com/Szam0siBarnabas/TextureBackport/releases/tag/TextureBackport-v1.2.0) section. 
+The default resource map can be downloaded from the [releases](https://github.com/Szam0siBarnabas/TextureBackport/releases/tag/TextureBackport-v1.2.1) section. 
 Resource map files must be placed into a folder named **resource_maps**, next to the application executable.
 
 The root structure of the resource map is as follows:
